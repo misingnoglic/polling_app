@@ -82,7 +82,19 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+# For when we're ready to do postgres.
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'polls',
+        'USER': 'arya',
+        'PASSWORD': app_secrets.POSTGRES_PASS,
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
