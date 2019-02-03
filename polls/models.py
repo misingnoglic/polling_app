@@ -30,7 +30,8 @@ class Question(models.Model):
 
     class Meta:
         abstract = False
-        unique_together = ("question_number", "poll")
+        unique_together = (("question_number", "poll"),
+                           ("question_text", "poll"))
         ordering = ['poll', 'question_number']
 
 
