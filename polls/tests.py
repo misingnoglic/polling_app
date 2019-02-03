@@ -51,6 +51,20 @@ class PollTestCase(TestCase):
                           question_text="Favorite Size?",
                           poll=self.poll)
 
+    def test_cant_create_multiple_choices_same_number(self):
+        with self.assertRaises(IntegrityError):
+            TextChoice.objects.create(
+                          choice_number=1,
+                          text="Onions",
+                          question=self.question1)
+
+    def test_cant_create_multiple_choices_same_text(self):
+        with self.assertRaises(IntegrityError):
+            TextChoice.objects.create(
+                          choice_number=3,
+                          text="Pineapple",
+                          question=self.question1)
+
     def test_rank_averaging(self):
         RankVote.objects.create(
             rank=5, question=self.question3, user=self.user1)
