@@ -72,5 +72,5 @@ models.RankVote(rank=2.0, question=question2, user=default_user).save()
 models.ChoiceVote(choice=q3c1, user=default_user).save()
 
 print(question1.get_most_popular())
-print(question2.avg_rank()['rank__avg'])
+print(question2.avg_rank())
 print(question3.get_most_popular())

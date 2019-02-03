@@ -80,7 +80,8 @@ class RankingQuestion(Question):
     high_end = models.IntegerField()
 
     def avg_rank(self):
-        return RankVote.objects.filter(question=self).aggregate(Avg('rank'))
+        return RankVote.objects.filter(
+            question=self).aggregate(Avg('rank'))['rank__avg']
 
 
 class RankVote(Vote):
