@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 
 class Poll(models.Model):
     title = models.CharField(max_length=100)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL)
+    # Setting null to true in case user deletes their account.
+    # We still want to keep the poll.
+    owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
 class Question(models.Model):
     question_number = models.PositiveSmallIntegerField()
