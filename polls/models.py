@@ -9,10 +9,16 @@ class Poll(models.Model):
     # We still want to keep the poll.
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
+    def __str__(self):
+        return f"#{self.pk} - {self.title}"
+
 class Question(models.Model):
     question_number = models.PositiveSmallIntegerField()
     question_text = models.CharField(max_length=100)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.question_text} - Question #{self.question_number} of poll #{self.poll.pk}"
+
 
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -25,7 +31,7 @@ class TextChoicesQuestion(Question):
 class TextChoice(models.Model):
     text = models.CharField(max_length=100)
     choice_number = models.PositiveSmallIntegerField()
-    question = TextChoicesQuestion
+    question = models.ForeignKey(TextChoicesQuestion, on_delete=models.CASCADE)
 
 class ChoiceVote(Vote):
     choice = models.ForeignKey(TextChoice, on_delete=models.CASCADE)
@@ -33,6 +39,7 @@ class ChoiceVote(Vote):
 class RankingQuestion(models.Model):
     low_end = models.IntegerField()
     high_end = models.IntegerField()
+    question = models.ForeignKey(TextChoicesQuestion, on_delete=models.CASCADE)
 
 class RankVote(Vote):
     rank = models.FloatField()
