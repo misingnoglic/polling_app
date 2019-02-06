@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 
 from .models import Poll, TextChoicesQuestion, RankingQuestion,\
-    RankVote, TextChoice, ChoiceVote
+    RankVote, TextChoice, ChoiceVote, TextChoiceNuance, ChoiceNuanceVote
 
 
 class PollTestCase(TestCase):
@@ -17,9 +17,13 @@ class PollTestCase(TestCase):
             question_text="Favorite Topping?",
             poll=self.poll)
         self.q1c1 = TextChoice.objects.create(text="Pepperoni", choice_number=1,
-                          question=self.question1)
+                                              question=self.question1)
         self.q1c2 = TextChoice.objects.create(text="Pineapple", choice_number=2,
-                          question=self.question1)
+                                              question=self.question1)
+
+        self.q1c2_nuance = TextChoiceNuance.objects.create(text="Only Hawaiian",
+                                                           choice=self.q1c2,
+                                                           added_by=self.user1)
 
         self.question2 = TextChoicesQuestion.objects.create(
             question_number=2,

@@ -19,6 +19,10 @@ os.system("python manage.py makemigrations polls")
 os.system("python manage.py migrate")
 
 User.objects.create_superuser('admin', 'admin@example.com', 'hihihi')
+User.objects.create_user('test', 'test@test.com', 'hihihi')
+User.objects.create_user('test2', 'test2@test.com', 'hihihi2')
+
+
 
 default_user = User.objects.get(pk=1)
 
@@ -41,6 +45,11 @@ q1c1.save()
 q1c2 = models.TextChoice(text="Pineapple", choice_number=2, question=question1,
                          added_by=default_user)
 q1c2.save()
+
+q1c2_nuance = models.TextChoiceNuance(text="Only Hawaiian", choice=q1c2,
+                                      added_by=default_user)
+
+q1c2_nuance.save()
 
 
 question2 = models.RankingQuestion(
@@ -74,9 +83,15 @@ q3c4 = models.TextChoice(text="Not in US", choice_number=4, question=question3,
 q3c4.save()
 
 models.ChoiceVote(choice=q1c2, user=default_user).save()
-models.RankVote(rank=2.0, question=question2, user=default_user).save()
+models.ChoiceNuanceVote(nuance=q1c2_nuance, user=default_user).save()
+models.RankVote(rank=3.0, question=question2, user_id=1).save()
+models.RankVote(rank=2.0, question=question2, user_id=2).save()
+models.RankVote(rank=2.0, question=question2, user_id=3).save()
+
 models.ChoiceVote(choice=q3c1, user=default_user).save()
 
 print(question1.get_most_popular())
 print(question2.avg_rank())
 print(question3.get_most_popular())
+
+print(p.serialize_to_json())

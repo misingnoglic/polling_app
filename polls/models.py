@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Avg
+from django.db.models import Avg, Count
+import json
 
 QUESTION_TYPES = ['rankingquestion', 'textchoicesquestion']
 
@@ -15,6 +16,15 @@ class Poll(models.Model):
     def __str__(self):
         return f"#{self.pk} - {self.title}"
 
+    def serialize_to_json(self):
+        return json.dumps({
+            'id': self.pk,
+            'title': self.title,
+            'owner': self.owner.pk,
+            'published': self.published,
+            'questions': [q.serialize_to_json() for q in self.get_questions()]
+        })
+
     def get_questions(self):
         return Question.objects.filter(poll=self)
 
@@ -26,6 +36,16 @@ class Question(models.Model):
     question_text = models.CharField(max_length=100)
     # The poll which this question is part of.
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+
+    def serialize_to_json(self):
+        base = {
+            'id': self.pk,
+            'question_number': self.question_number,
+            'question_text': self.question_text,
+            'type': self.get_type()
+        }
+        base.update(self.get_child_class().serialize_to_json())
+        return base
 
     def __str__(self):
         return f"{self.question_text} - Question #{self.question_number} of poll #{self.poll.pk}"
@@ -64,6 +84,18 @@ class TextChoicesQuestion(Question):
             TextChoice.objects.filter(question=self),
             key=lambda x: x.num_votes())
 
+    def get_choices(self):
+        return TextChoice.objects.filter(question=self)
+
+    def serialize_to_json(self):
+        return {
+            'id': self.pk,
+            'can_choose_multiple': self.can_choose_multiple,
+            'others_can_add': self.others_can_add,
+            'choices': [
+                choice.serialize_to_json() for choice in self.get_choices()]
+        }
+
 
 class TextChoice(models.Model):
     text = models.CharField(max_length=100)
@@ -71,21 +103,47 @@ class TextChoice(models.Model):
     question = models.ForeignKey(TextChoicesQuestion, on_delete=models.CASCADE)
     added_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
+    def serialize_to_json(self):
+        return {
+            'id': self.pk,
+            'text': self.text,
+            'choice_number': self.choice_number,
+            'added_by': self.added_by.pk,
+            'votes': self.num_votes(),
+            'nuances': [
+                nuance.serialize_to_json() for nuance in self.get_nuances()]
+        }
+
     def __str__(self):
         return f"{self.text}"
 
     class Meta:
         abstract = False
         unique_together = (("question", "choice_number"), ("question", "text"))
+        ordering = ['question__poll', 'question', 'choice_number']
 
     def num_votes(self):
         return ChoiceVote.objects.filter(choice=self).count()
+
+    def get_nuances(self):
+        return TextChoiceNuance.objects.filter(choice=self)
 
 
 class TextChoiceNuance(models.Model):
     text = models.CharField(max_length=100)
     choice = models.ForeignKey(TextChoice, on_delete=models.CASCADE)
     added_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    def serialize_to_json(self):
+        return {
+            'id': self.pk,
+            'text': self.text,
+            'added_by': self.added_by.pk,
+            'votes': self.num_votes()
+        }
+
+    def num_votes(self):
+        return ChoiceNuanceVote.objects.filter(nuance=self).count()
 
 
 class ChoiceVote(Vote):
@@ -99,10 +157,13 @@ class ChoiceVote(Vote):
 
 
 class ChoiceNuanceVote(Vote):
-    choice = models.ForeignKey(TextChoiceNuance, on_delete=models.CASCADE)
+    nuance = models.ForeignKey(TextChoiceNuance, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Vote for {self.choice.text}"
+        return f"Vote for {self.nuance.text}"
+
+    class Meta:
+        unique_together = ("nuance", "user")
 
 
 class RankingQuestion(Question):
@@ -112,6 +173,19 @@ class RankingQuestion(Question):
     def avg_rank(self):
         return RankVote.objects.filter(
             question=self).aggregate(Avg('rank'))['rank__avg']
+
+    def vote_breakdown(self):
+        return RankVote.objects.filter(question=self).values('rank').annotate(
+            total=Count('rank')).order_by('total')
+
+    def serialize_to_json(self):
+        return {
+            'id': self.pk,
+            'low_end': self.low_end,
+            'high_end': self.high_end,
+            'votes': list(self.vote_breakdown()),
+            'average': self.avg_rank(),
+        }
 
 
 class RankVote(Vote):
