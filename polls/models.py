@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Avg
 
+QUESTION_TYPES = ['rankingquestion', 'textchoicesquestion']
+
 
 class Poll(models.Model):
     title = models.CharField(max_length=100)
@@ -28,6 +30,12 @@ class Question(models.Model):
     def __str__(self):
         return f"{self.question_text} - Question #{self.question_number} of poll #{self.poll.pk}"
 
+    def get_type(self):
+        for t in QUESTION_TYPES:
+            if hasattr(self, t):
+                return t
+        raise Exception("Invalid Question Type")
+
     class Meta:
         abstract = False
         unique_together = (("question_number", "poll"),
@@ -39,7 +47,7 @@ class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        abstract = False
+        abstract = True
 
 
 class TextChoicesQuestion(Question):
@@ -47,6 +55,7 @@ class TextChoicesQuestion(Question):
     others_can_add = models.BooleanField(default=False)
 
     def get_most_popular(self):
+        # TODO(arya): Make this query just with the ORM
         return max(
             TextChoice.objects.filter(question=self),
             key=lambda x: x.num_votes())
@@ -56,6 +65,7 @@ class TextChoice(models.Model):
     text = models.CharField(max_length=100)
     choice_number = models.PositiveSmallIntegerField()
     question = models.ForeignKey(TextChoicesQuestion, on_delete=models.CASCADE)
+    added_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"{self.text}"
@@ -87,3 +97,7 @@ class RankingQuestion(Question):
 class RankVote(Vote):
     rank = models.IntegerField()
     question = models.ForeignKey(RankingQuestion, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("user", "question")
+

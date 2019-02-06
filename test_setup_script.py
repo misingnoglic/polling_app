@@ -35,9 +35,11 @@ question1 = models.TextChoicesQuestion(
     others_can_add=False)
 question1.save()
 
-q1c1 = models.TextChoice(text="Pepperoni", choice_number=1, question=question1)
+q1c1 = models.TextChoice(text="Pepperoni", choice_number=1, question=question1,
+                         added_by=default_user)
 q1c1.save()
-q1c2 = models.TextChoice(text="Pineapple", choice_number=2, question=question1)
+q1c2 = models.TextChoice(text="Pineapple", choice_number=2, question=question1,
+                         added_by=default_user)
 q1c2.save()
 
 
@@ -58,13 +60,17 @@ question3 = models.TextChoicesQuestion(
     others_can_add=False)
 question3.save()
 
-q3c1 = models.TextChoice(text="West Coast", choice_number=1, question=question3)
+q3c1 = models.TextChoice(text="West Coast", choice_number=1, question=question3,
+                         added_by=default_user)
 q3c1.save()
-q3c2 = models.TextChoice(text="East Coast", choice_number=2, question=question3)
+q3c2 = models.TextChoice(text="East Coast", choice_number=2, question=question3,
+                         added_by=default_user)
 q3c2.save()
-q3c3 = models.TextChoice(text="Midwest", choice_number=3, question=question3)
+q3c3 = models.TextChoice(text="Midwest", choice_number=3, question=question3,
+                         added_by=default_user)
 q3c3.save()
-q3c4 = models.TextChoice(text="Not in US", choice_number=4, question=question3)
+q3c4 = models.TextChoice(text="Not in US", choice_number=4, question=question3,
+                         added_by=default_user)
 q3c4.save()
 
 models.ChoiceVote(choice=q1c2, user=default_user).save()

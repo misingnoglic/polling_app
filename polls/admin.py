@@ -43,4 +43,4 @@ class QTextChoicesQuestionAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register([TextChoice, ChoiceVote, RankingQuestion, RankVote, Vote])
+admin.site.register([TextChoice, ChoiceVote, RankingQuestion, RankVote])

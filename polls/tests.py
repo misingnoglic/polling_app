@@ -72,6 +72,13 @@ class PollTestCase(TestCase):
             rank=3, question=self.question3, user=self.user2)
         self.assertEquals(self.question3.avg_rank(), 4.0)
 
+    def test_rank_cant_vote_twice(self):
+        RankVote.objects.create(
+            rank=5, question=self.question3, user=self.user1)
+        with self.assertRaises(IntegrityError):
+            RankVote.objects.create(
+                rank=4, question=self.question3, user=self.user1)
+
     def test_text_choice_counting(self):
             self.assertEquals(self.q1c1.num_votes(), 2)
             self.assertEquals(self.q1c2.num_votes(), 1)
@@ -79,3 +86,7 @@ class PollTestCase(TestCase):
     def test_text_choice_winner(self):
             self.assertEquals(self.question1.get_most_popular(), self.q1c1)
 
+    def test_question_get_type(self):
+        questions = list(self.poll.get_questions())
+        self.assertEqual(questions[0].get_type(), 'textchoicesquestion')
+        self.assertEqual(questions[0].get_type(), 'rankingquestion')
