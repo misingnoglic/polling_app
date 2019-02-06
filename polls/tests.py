@@ -89,4 +89,9 @@ class PollTestCase(TestCase):
     def test_question_get_type(self):
         questions = list(self.poll.get_questions())
         self.assertEqual(questions[0].get_type(), 'textchoicesquestion')
-        self.assertEqual(questions[0].get_type(), 'rankingquestion')
+        self.assertEqual(questions[2].get_type(), 'rankingquestion')
+
+    def test_question_get_child_class(self):
+        questions = list(self.poll.get_questions())
+        self.assertEqual(questions[0].get_child_class(), self.question1)
+        self.assertEqual(questions[2].get_child_class(), self.question3)

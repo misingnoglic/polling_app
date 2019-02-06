@@ -36,6 +36,10 @@ class Question(models.Model):
                 return t
         raise Exception("Invalid Question Type")
 
+    def get_child_class(self):
+        t = self.get_type()
+        return getattr(self, t)
+
     class Meta:
         abstract = False
         unique_together = (("question_number", "poll"),
@@ -78,8 +82,24 @@ class TextChoice(models.Model):
         return ChoiceVote.objects.filter(choice=self).count()
 
 
+class TextChoiceNuance(models.Model):
+    text = models.CharField(max_length=100)
+    choice = models.ForeignKey(TextChoice, on_delete=models.CASCADE)
+    added_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+
 class ChoiceVote(Vote):
     choice = models.ForeignKey(TextChoice, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Vote for {self.choice.text}"
+
+    class Meta:
+        unique_together = ("choice", "user")
+
+
+class ChoiceNuanceVote(Vote):
+    choice = models.ForeignKey(TextChoiceNuance, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Vote for {self.choice.text}"
