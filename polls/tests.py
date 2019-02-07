@@ -99,3 +99,11 @@ class PollTestCase(TestCase):
         questions = list(self.poll.question_set.all())
         self.assertEqual(questions[0].get_child_class(), self.question1)
         self.assertEqual(questions[2].get_child_class(), self.question3)
+
+    def test_nuance_count(self):
+        nuance_vote = ChoiceNuanceVote.objects.create(
+            user=self.user1, nuance=self.q1c2_nuance)
+        self.assertEqual(
+            self.q1c2.textchoicenuance_set.first().num_votes(), 1)
+        self.assertEqual(self.q1c2_nuance.choicenuancevote_set.first(),
+                         nuance_vote)

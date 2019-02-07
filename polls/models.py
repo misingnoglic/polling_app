@@ -25,6 +25,7 @@ class Poll(models.Model):
             'questions': [q.serialize_to_json() for q in self.question_set.all()]
         })
 
+
 class Question(models.Model):
     # Which number question on the poll. (E.g. first, second, third)
     question_number = models.PositiveSmallIntegerField()
@@ -132,7 +133,7 @@ class TextChoiceNuance(models.Model):
         }
 
     def num_votes(self):
-        return self.choicenuancevote_set.all().count()
+        return self.choicenuancevote_set.count()
 
 
 class ChoiceVote(Vote):
