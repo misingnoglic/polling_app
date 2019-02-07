@@ -8,10 +8,12 @@ class QuestionInline(admin.TabularInline):
 
 
 class RankingQuestionInline(admin.TabularInline):
+    show_change_link = True
     model = RankingQuestion
 
 
 class TextChoiceQuestionInline(admin.TabularInline):
+    show_change_link = True
     model = TextChoicesQuestion
 
 

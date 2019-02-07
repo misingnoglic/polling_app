@@ -22,8 +22,12 @@ class Poll(models.Model):
             'title': self.title,
             'owner': self.owner.pk,
             'published': self.published,
-            'questions': [q.serialize_to_json() for q in self.question_set.all()]
+            'questions': [
+                q.serialize_to_json() for q in self.question_set.all()]
         })
+
+    class Meta:
+        ordering = ['-pk']
 
 
 class Question(models.Model):
