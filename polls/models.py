@@ -165,7 +165,7 @@ class RankingQuestion(Question):
 
     def vote_breakdown(self):
         return self.rankvote_set.all().values('rank').annotate(
-            total=Count('rank')).order_by('total')
+            total=Count('rank')).order_by('rank')
 
     def serialize_to_json(self):
         return {

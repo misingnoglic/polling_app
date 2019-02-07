@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Polls</title>
+</head>
+<body>
+<h1>Here are your polls.</h1>
+<ol>
+{% for poll in polls %}
+    <li>Poll #{{ forloop.counter }}- {{ poll.title }}</li>
+    <ol>
+    {% for question in poll.question_set.all %}
+        <li>Question #{{ question.question_number }}- {{ question.question_text }}</li>
+        <ul>
+        {% if question.get_type == 'textchoicesquestion' %}
+            {% for choice in question.textchoicesquestion.textchoice_set.all %}
+                <li>{{ choice.text }} - {{ choice.num_votes }} votes</li>
+            {% endfor %}
+        {% elif question.get_type == 'rankingquestion' %}
+            {% for rank in question.rankingquestion.vote_breakdown %}
+                <li>{{ rank.rank }}: {{ rank.total }} votes</li>
+            {% endfor %}
+        {% endif %}
+        </ul>
+    {% endfor %}
+    </ol>
+{% endfor %}
+</ol>
+</body>
+</html>
