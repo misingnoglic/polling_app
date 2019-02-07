@@ -40,7 +40,7 @@ class PollTestCase(TestCase):
         ChoiceVote.objects.create(choice=self.q1c2, user=self.user3)
 
     def test_can_query_questions_in_order(self):
-        questions = list(self.poll.get_questions())
+        questions = list(self.poll.question_set.all())
         self.assertEqual(questions[0].textchoicesquestion,
                          self.question1)
         self.assertEqual(questions[1].textchoicesquestion,
@@ -91,11 +91,11 @@ class PollTestCase(TestCase):
             self.assertEquals(self.question1.get_most_popular(), self.q1c1)
 
     def test_question_get_type(self):
-        questions = list(self.poll.get_questions())
+        questions = list(self.poll.question_set.all())
         self.assertEqual(questions[0].get_type(), 'textchoicesquestion')
         self.assertEqual(questions[2].get_type(), 'rankingquestion')
 
     def test_question_get_child_class(self):
-        questions = list(self.poll.get_questions())
+        questions = list(self.poll.question_set.all())
         self.assertEqual(questions[0].get_child_class(), self.question1)
         self.assertEqual(questions[2].get_child_class(), self.question3)

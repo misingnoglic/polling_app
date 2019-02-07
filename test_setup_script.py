@@ -95,3 +95,9 @@ print(question2.avg_rank())
 print(question3.get_most_popular())
 
 print(p.serialize_to_json())
+
+# import logging
+# l = logging.getLogger('django.db.backends')
+# l.setLevel(logging.DEBUG)
+# l.addHandler(logging.StreamHandler())
+# print(question2.avg_rank())

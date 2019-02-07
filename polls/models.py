@@ -22,12 +22,8 @@ class Poll(models.Model):
             'title': self.title,
             'owner': self.owner.pk,
             'published': self.published,
-            'questions': [q.serialize_to_json() for q in self.get_questions()]
+            'questions': [q.serialize_to_json() for q in self.question_set.all()]
         })
-
-    def get_questions(self):
-        return Question.objects.filter(poll=self)
-
 
 class Question(models.Model):
     # Which number question on the poll. (E.g. first, second, third)
@@ -80,12 +76,7 @@ class TextChoicesQuestion(Question):
 
     def get_most_popular(self):
         # TODO(arya): Make this query just with the ORM
-        return max(
-            TextChoice.objects.filter(question=self),
-            key=lambda x: x.num_votes())
-
-    def get_choices(self):
-        return TextChoice.objects.filter(question=self)
+        return max(self.textchoice_set.all(), key=lambda x: x.num_votes())
 
     def serialize_to_json(self):
         return {
@@ -93,7 +84,7 @@ class TextChoicesQuestion(Question):
             'can_choose_multiple': self.can_choose_multiple,
             'others_can_add': self.others_can_add,
             'choices': [
-                choice.serialize_to_json() for choice in self.get_choices()]
+                choice.serialize_to_json() for choice in self.textchoice_set.all()]
         }
 
 
@@ -111,7 +102,8 @@ class TextChoice(models.Model):
             'added_by': self.added_by.pk,
             'votes': self.num_votes(),
             'nuances': [
-                nuance.serialize_to_json() for nuance in self.get_nuances()]
+                nuance.serialize_to_json() for nuance in
+                self.textchoicenuance_set.all()]
         }
 
     def __str__(self):
@@ -124,9 +116,6 @@ class TextChoice(models.Model):
 
     def num_votes(self):
         return ChoiceVote.objects.filter(choice=self).count()
-
-    def get_nuances(self):
-        return TextChoiceNuance.objects.filter(choice=self)
 
 
 class TextChoiceNuance(models.Model):
@@ -143,7 +132,7 @@ class TextChoiceNuance(models.Model):
         }
 
     def num_votes(self):
-        return ChoiceNuanceVote.objects.filter(nuance=self).count()
+        return self.choicenuancevote_set.all().count()
 
 
 class ChoiceVote(Vote):
@@ -171,11 +160,10 @@ class RankingQuestion(Question):
     high_end = models.IntegerField()
 
     def avg_rank(self):
-        return RankVote.objects.filter(
-            question=self).aggregate(Avg('rank'))['rank__avg']
+        return self.rankvote_set.all().aggregate(Avg('rank'))['rank__avg']
 
     def vote_breakdown(self):
-        return RankVote.objects.filter(question=self).values('rank').annotate(
+        return self.rankvote_set.all().values('rank').annotate(
             total=Count('rank')).order_by('total')
 
     def serialize_to_json(self):
