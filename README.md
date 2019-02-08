@@ -5,7 +5,8 @@ This is a Django app for advanced polling. Will hopefully be fun :)
 # Setup Guide
 
 - Install Python 3.6+
-- Create a new virtual environment and source it (I like to use virtualenvwrapper)
+- Create a new virtual environment and source it
+ (I like to use [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/))
 - run `pip install -r requirements.txt`
 - Create a file `poll/app_secrets.py` and ask Arya for the contents.
 - Run `python test_setup_script.py` - it should print out a large JSON at the end.
