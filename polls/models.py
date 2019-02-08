@@ -120,7 +120,7 @@ class TextChoice(models.Model):
         ordering = ['question__poll', 'question', 'choice_number']
 
     def num_votes(self):
-        return ChoiceVote.objects.filter(choice=self).count()
+        return self.choicevote_set.count()
 
 
 class TextChoiceNuance(models.Model):
