@@ -27,8 +27,6 @@ User.objects.create_superuser('admin', 'admin@example.com', 'hihihi')
 User.objects.create_user('test', 'test@test.com', 'hihihi')
 User.objects.create_user('test2', 'test2@test.com', 'hihihi2')
 
-
-
 default_user = User.objects.get(pk=1)
 
 p = models.Poll(title="My Pizza Poll", owner=default_user)

@@ -22,7 +22,7 @@ def index(request):
                   })
 
 
-@login_required
+@login_required(login_url='/polls/login')
 def your_polls(request):
     return render(request, 'list_polls.html',
                   context={
