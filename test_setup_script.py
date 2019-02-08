@@ -12,8 +12,13 @@ from django.contrib.auth.models import User
 
 print(os.getcwd())
 
-os.system("del polls\\migrations")
-os.system("del db.sqlite3")
+if os.name == 'nt':
+    os.system("del polls\\migrations")
+    os.system("del db.sqlite3")
+else:
+    os.system("rm -rf polls/migrations")
+    os.system("rm -rf db.sqlite3")
+
 os.system("python manage.py makemigrations")
 os.system("python manage.py makemigrations polls")
 os.system("python manage.py migrate")

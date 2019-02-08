@@ -181,3 +181,8 @@ fabric.properties
 # End of https://www.gitignore.io/api/pycharm
 
 poll/app_secrets.py
+
+# idea files
+.idea
+
+db.sqlite3
