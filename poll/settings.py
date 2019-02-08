@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polls.apps.PollsConfig',
-    'debug_toolbar'
+    'debug_toolbar',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
