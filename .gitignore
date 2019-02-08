@@ -182,6 +182,7 @@ fabric.properties
 
 poll/app_secrets.py
 
-# python 3 virtual env
+# idea files
 .idea
-env
+
+db.sqlite3
