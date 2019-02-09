@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Avg, Count
+from . import constants
 import json
-
-QUESTION_TYPES = ['rankingquestion', 'textchoicesquestion']
 
 
 class Poll(models.Model):
@@ -52,7 +51,7 @@ class Question(models.Model):
         return f"{self.question_text} - Question #{self.question_number} of poll #{self.poll.pk}"
 
     def get_type(self):
-        for t in QUESTION_TYPES:
+        for t in constants.QUESTION_TYPES:
             if hasattr(self, t):
                 return t
         raise Exception("Invalid Question Type")
@@ -81,7 +80,8 @@ class TextChoicesQuestion(Question):
 
     def get_most_popular(self):
         # TODO(arya): Make this query just with the ORM
-        return max(self.textchoice_set.all(), key=lambda x: x.num_votes())
+        return max(self.textchoice_set.prefetch_related(
+            'choicevote_set').all(), key=lambda x: x.num_votes())
 
     def serialize_to_json(self):
         return {
@@ -89,7 +89,8 @@ class TextChoicesQuestion(Question):
             'can_choose_multiple': self.can_choose_multiple,
             'others_can_add': self.others_can_add,
             'choices': [
-                choice.serialize_to_json() for choice in self.textchoice_set.all()]
+                choice.serialize_to_json() for choice in (
+                    self.textchoice_set.all())]
         }
 
 
