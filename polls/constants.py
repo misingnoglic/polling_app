@@ -9,4 +9,7 @@ POLL_PREFETCH_FIELDS = [
     'question_set__textchoicesquestion__textchoice_set__textchoicenuance_set__choicenuancevote_set',
 ]
 
+QUESTION_PREFETCH_FIELDS = [
+    field.replace('question_set__', '') for field in POLL_PREFETCH_FIELDS[1:]]
+
 QUESTION_TYPES = ['rankingquestion', 'textchoicesquestion']

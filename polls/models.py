@@ -22,6 +22,10 @@ class Poll(models.Model):
             'owner': self.owner.pk,
             'published': self.published,
             'questions': [
+                # TODO(arya): Prefetch these fields.
+                # Use constants.QUESTION_PREFETCH_FIELDS.
+                # In the future, make prefetching granular
+                # Only prefetch if not called by a method which prefetches).
                 q.serialize_to_json() for q in self.question_set.all()]
         })
 
@@ -79,7 +83,7 @@ class TextChoicesQuestion(Question):
     others_can_add = models.BooleanField(default=False)
 
     def get_most_popular(self):
-        # TODO(arya): Make this query just with the ORM
+        # TODO(arya): Make this query just with the ORM (use aggregates)
         return max(self.textchoice_set.prefetch_related(
             'choicevote_set').all(), key=lambda x: x.num_votes())
 

@@ -17,5 +17,6 @@ def your_polls(request):
     return render(request, 'list_polls.html',
                   context={
                       'polls': Poll.objects.prefetch_related(
-                          *constants.POLL_PREFETCH_FIELDS).filter(owner=request.user)
+                          *constants.POLL_PREFETCH_FIELDS).filter(
+                          owner=request.user)
                   })
