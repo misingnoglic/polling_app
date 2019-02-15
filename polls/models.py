@@ -193,3 +193,14 @@ class RankVote(Vote):
     class Meta:
         unique_together = ("user", "question")
 
+
+# One to One relationship with a regular user.
+class PollUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    birthday = models.DateField(null=True, blank=True)
+    # TODO(arya): Figure out how to represent gender & sex & orientation.
+    # TODO(arya): Figure out how to do birth country, current location,
+    #  states, etc...
+    # TODO(arya): Figure out how to do stuff like high school,
+    #  highest education completed, college major, job, etc...
+
