@@ -23,9 +23,9 @@ class Poll(models.Model):
             'published': self.published,
             'questions': [
                 # TODO(arya): Prefetch these fields.
-                # Use constants.QUESTION_PREFETCH_FIELDS.
-                # In the future, make prefetching granular
-                # Only prefetch if not called by a method which prefetches).
+                #  Use constants.QUESTION_PREFETCH_FIELDS.
+                #  In the future, make prefetching granular
+                #  Only prefetch if not called by a method which prefetches).
                 q.serialize_to_json() for q in self.question_set.all()]
         })
 
