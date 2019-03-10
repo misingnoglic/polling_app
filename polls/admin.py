@@ -18,6 +18,7 @@ class TextChoiceQuestionInline(admin.TabularInline):
 
 
 class TextChoiceInline(admin.TabularInline):
+    show_change_link = True
     model = TextChoice
 
 
@@ -39,7 +40,7 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 @admin.register(TextChoicesQuestion)
-class QTextChoicesQuestionAdmin(admin.ModelAdmin):
+class TextChoicesQuestionAdmin(admin.ModelAdmin):
     inlines = [
         TextChoiceInline
     ]
