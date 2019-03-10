@@ -1,5 +1,9 @@
 import os
 import django
+import sys
+
+if not sys.version_info >= (3, 7):
+    raise Exception("You need Python 3.7, this is 2019")
 
 print(os.getcwd())
 
@@ -15,13 +19,15 @@ print(os.getcwd())
 if os.name == 'nt':
     os.system("del polls\\migrations")
     os.system("del db.sqlite3")
+    system_python = 'python'
 else:
+    system_python = 'python3'
     os.system("rm -rf polls/migrations")
     os.system("rm -rf db.sqlite3")
 
-os.system("python manage.py makemigrations")
-os.system("python manage.py makemigrations polls")
-os.system("python manage.py migrate")
+os.system(f"{system_python} manage.py makemigrations")
+os.system(f"{system_python} manage.py makemigrations polls")
+os.system(f"{system_python} manage.py migrate")
 
 User.objects.create_superuser('admin', 'admin@example.com', 'hihihi')
 User.objects.create_user('test', 'test@test.com', 'hihihi')
