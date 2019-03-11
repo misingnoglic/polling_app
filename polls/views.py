@@ -34,16 +34,20 @@ def vote_on_poll(request, poll_id):
                 choices = request.POST.getlist(
                     f'choiceForQuestion{question.question_number}')
                 if question.get_type() == 'rankingquestion':
-                    for choice in choices:
-                        vote = RankVote(rank=int(choice),
-                                        question=question.rankingquestion,
-                                        user=user)
-                        vote.save()
-                elif question.get_type() == 'textchoicesquestion':
-                    # TODO: Can vote on multiple...
-                    choice = TextChoice.objects.get(pk=choices[0])
-                    vote = ChoiceVote(choice=choice, user=user)
+                    if len(choices) != 1:
+                        raise ValueError("Invalid # of choices")
+                    vote = RankVote(rank=int(choices[0]),
+                                    question=question.rankingquestion,
+                                    user=user)
                     vote.save()
+                elif question.get_type() == 'textchoicesquestion':
+                    if not question.textchoicequestion.can_choose_multiple:
+                        if len(choices) != 1:
+                            raise ValueError("Invalid # of choices")
+                    for choice_id in choices:
+                        choice = TextChoice.objects.get(pk=choice_id)
+                        vote = ChoiceVote(choice=choice, user=user)
+                        vote.save()
         return redirect(reverse('polls:index'))
 
     return render(request, 'vote.html', context={'poll': poll})
