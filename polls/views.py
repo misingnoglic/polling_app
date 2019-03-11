@@ -49,5 +49,6 @@ def vote_on_poll(request, poll_id):
                         vote = ChoiceVote(choice=choice, user=user)
                         vote.save()
         return redirect(reverse('polls:index'))
-
-    return render(request, 'vote.html', context={'poll': poll})
+    else:
+        # Display UI to vote
+        return render(request, 'vote.html', context={'poll': poll})
