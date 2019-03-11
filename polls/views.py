@@ -29,20 +29,19 @@ def vote_on_poll(request, poll_id):
         id=poll_id)
     user = request.user
     if request.method == "POST":
-        print(request.POST)
         with transaction.atomic():
             for question in poll.question_set.all():
-                choice_raw = request.POST[
-                    f'choiceForQuestion{question.question_number}']
+                choices = request.POST.getlist(
+                    f'choiceForQuestion{question.question_number}')
                 if question.get_type() == 'rankingquestion':
-                    choice = choice_raw
-                    vote = RankVote(rank=int(choice),
-                                    question=question.rankingquestion,
-                                    user=user)
-                    vote.save()
+                    for choice in choices:
+                        vote = RankVote(rank=int(choice),
+                                        question=question.rankingquestion,
+                                        user=user)
+                        vote.save()
                 elif question.get_type() == 'textchoicesquestion':
                     # TODO: Can vote on multiple...
-                    choice = TextChoice.objects.get(pk=choice_raw)
+                    choice = TextChoice.objects.get(pk=choices[0])
                     vote = ChoiceVote(choice=choice, user=user)
                     vote.save()
         return redirect(reverse('polls:index'))
