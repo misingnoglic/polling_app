@@ -1,3 +1,4 @@
+<body>
 <h1>{{ poll.title }}</h1>
 <form action="{% url 'polls:vote' poll.id %}" method="post">
     {% csrf_token %}
@@ -5,15 +6,15 @@
         <h2>{{ question.question_text }}</h2>
         {% if question.get_type == 'textchoicesquestion' %}
             {% for choice in question.textchoicesquestion.textchoice_set.all %}
-                <input type="radio" name="choiceForQuestion{{ question.id }}" id="choice{{ choice.choice_number }}" value="{{ choice.id }}">
+                <input type="{{ question.textchoicesquestion.form_type }}" name="choiceForQuestion{{ question.question_number }}" id="choice{{ choice.choice_number }}" value="{{ choice.id }}">
                 <label for="choice{{ choice.choice_number }}">{{ choice.text }}</label><br>
                 {% comment %}
                     TODO: Nuance
                 {% endcomment %}
             {% endfor %}
         {% elif question.get_type == 'rankingquestion' %}
-            <input type="range" id="question{{ question.question_number }}" name="choice"
-                   min="{{ question.low_end }}" max="{{ question.high_end }}">
+            <input type="range" id="question{{ question.question_number }}" name="choiceForQuestion{{ question.question_number }}"
+                   min="{{ question.rankingquestion.low_end }}" max="{{ question.rankingquestion.high_end }}">
             <label for="question{{ question.question_number }}">{{ question.question_text }}</label>
         {% else %}
             <li>Invalid Question?</li>
@@ -21,3 +22,4 @@
     {% endfor %}
     <input type="submit" value="Vote">
 </form>
+</body>

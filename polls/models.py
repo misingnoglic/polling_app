@@ -87,6 +87,12 @@ class TextChoicesQuestion(Question):
         return max(self.textchoice_set.prefetch_related(
             'choicevote_set').all(), key=lambda x: x.num_votes())
 
+    def form_type(self):
+        if self.can_choose_multiple:
+            return 'checkbox'
+        else:
+            return 'radio'
+
     def serialize_to_json(self):
         return {
             'id': self.pk,

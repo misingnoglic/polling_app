@@ -8,7 +8,7 @@
 <h1>Here are your polls.</h1>
 <ol>
 {% for poll in polls %}
-    <li>Poll #{{ forloop.counter }} - {{ poll.title }}</li>
+    <li>Poll #{{ forloop.counter }} - {{ poll.title }} <a href="{% url 'polls:vote' poll.id %}">(Vote Here)</a></li>
     <ol>
     {% for question in poll.question_set.all %}
         <li>{{ question.question_text }}</li>
