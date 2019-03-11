@@ -41,7 +41,7 @@ def vote_on_poll(request, poll_id):
                                     user=user)
                     vote.save()
                 elif question.get_type() == 'textchoicesquestion':
-                    if not question.textchoicequestion.can_choose_multiple:
+                    if not question.textchoicesquestion.can_choose_multiple:
                         if len(choices) != 1:
                             raise ValueError("Invalid # of choices")
                     for choice_id in choices:
