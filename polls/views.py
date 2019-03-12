@@ -36,18 +36,9 @@ def vote_on_poll(request, poll_id):
                 if question.get_type() == 'rankingquestion':
                     if len(choices) != 1:
                         raise ValueError("Invalid # of choices")
-                    vote = RankVote(rank=int(choices[0]),
-                                    question=question.rankingquestion,
-                                    user=user)
-                    vote.save()
+                    question.vote(user=user, rank=int(choices[0]))
                 elif question.get_type() == 'textchoicesquestion':
-                    if not question.textchoicesquestion.can_choose_multiple:
-                        if len(choices) != 1:
-                            raise ValueError("Invalid # of choices")
-                    for choice_id in choices:
-                        choice = TextChoice.objects.get(pk=choice_id)
-                        vote = ChoiceVote(choice=choice, user=user)
-                        vote.save()
+                    question.vote(user, choices)
         return redirect(reverse('polls:index'))
     else:
         # Display UI to vote

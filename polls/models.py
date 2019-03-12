@@ -65,6 +65,9 @@ class Question(models.Model):
         t = self.get_type()
         return getattr(self, t)
 
+    def vote(self, *args, **kwargs):
+        self.get_child_class().vote(*args, **kwargs)
+
     class Meta:
         abstract = False
         unique_together = (("question_number", "poll"),
@@ -112,7 +115,7 @@ class TextChoicesQuestion(Question):
         # See if they've voted before for any Text Choices for this Question
         ChoiceVote.objects.filter(user=user, choice__question=self).delete()
         for choice in choices:
-            ChoiceVote.objects.create(choice_id=choice, user=user)
+            ChoiceVote.objects.create(choice_id=int(choice), user=user)
 
 
 class TextChoice(models.Model):
