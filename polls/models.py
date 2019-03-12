@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Avg, Count
+from django.core.exceptions import ObjectDoesNotExist
 from . import constants
 import json
 
@@ -103,6 +104,16 @@ class TextChoicesQuestion(Question):
                     self.textchoice_set.all())]
         }
 
+    def vote(self, user, choices):
+        if not self.can_choose_multiple:
+            if len(choices) != 1:
+                raise ValueError("Too many selections...")
+
+        # See if they've voted before for any Text Choices for this Question
+        ChoiceVote.objects.filter(user=user, choice__question=self).delete()
+        for choice in choices:
+            ChoiceVote.objects.create(choice_id=choice, user=user)
+
 
 class TextChoice(models.Model):
     text = models.CharField(max_length=100)
@@ -190,6 +201,18 @@ class RankingQuestion(Question):
             'votes': list(self.vote_breakdown()),
             'average': self.avg_rank(),
         }
+
+    def vote(self, user, rank):
+        # Make sure a user hasn't voted.
+        try:
+            v = RankVote.objects.get(question=self, user=user)
+            if v.rank == rank:
+                return  # Nothing to change...
+        except ObjectDoesNotExist:
+            v = RankVote(user=user, rank=rank, question=self)
+        v.rank = rank
+        v.save()
+        return v
 
 
 class RankVote(Vote):

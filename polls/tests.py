@@ -11,6 +11,7 @@ class PollTestCase(TestCase):
         self.user1 = User.objects.create(username='Testuser')
         self.user2 = User.objects.create(username='Testuser2')
         self.user3 = User.objects.create(username='Testuser3')
+        self.user4 = User.objects.create(username='Testuser4')
         self.poll = Poll.objects.create(title="My Pizza Poll", owner=self.user1)
         self.question1 = TextChoicesQuestion.objects.create(
             question_number=1,
@@ -107,3 +108,34 @@ class PollTestCase(TestCase):
             self.q1c2.textchoicenuance_set.first().num_votes(), 1)
         self.assertEqual(self.q1c2_nuance.choicenuancevote_set.first(),
                          nuance_vote)
+
+    def test_choice_vote_method(self):
+        self.question1.vote(user=self.user4, choices=[self.q1c1.pk])
+        # Assert that the vote exists now
+        self.assertEqual(
+            ChoiceVote.objects.filter(
+                user=self.user4, choice=self.q1c1).count(), 1)
+        # Vote for a new choice
+        self.question1.vote(user=self.user4, choices=[self.q1c2.pk])
+        # Assert that the vote exists now
+        self.assertEqual(
+            ChoiceVote.objects.filter(
+                user=self.user4, choice=self.q1c2).count(), 1)
+        # Assert old vote is deleted
+        self.assertEqual(
+            ChoiceVote.objects.filter(
+                user=self.user4, choice=self.q1c1).count(), 0)
+
+    def test_rank_vote_method(self):
+        self.question3.vote(user=self.user4, rank=3)
+        self.assertEqual(
+            RankVote.objects.get(
+                user=self.user4, question=self.question3).rank, 3)
+        # Vote again!
+        self.question3.vote(user=self.user4, rank=4)
+        self.assertEqual(
+            RankVote.objects.filter(
+                user=self.user4, question=self.question3).count(), 1)
+        self.assertEqual(
+            RankVote.objects.get(
+                user=self.user4, question=self.question3).rank, 4)
