@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 
 from .models import Poll, TextChoicesQuestion, RankingQuestion,\
-    RankVote, TextChoice, ChoiceVote, TextChoiceNuance, ChoiceNuanceVote
+    RankVote, TextChoice, ChoiceVote, TextChoiceNuance, ChoiceNuanceVote,\
+    PollTag
 
 
 class PollTestCase(TestCase):
@@ -139,3 +140,19 @@ class PollTestCase(TestCase):
         self.assertEqual(
             RankVote.objects.get(
                 user=self.user4, question=self.question3).rank, 4)
+
+    def test_tag_creation(self):
+        PollTag.get_or_create("test")
+        # Should not create a new tag.
+        PollTag.get_or_create("test")
+        self.assertEqual(PollTag.objects.all().count(), 1)
+        self.assertEqual(PollTag.objects.get(tag="test").tag, "test")
+
+    def test_add_bulk_tags(self):
+        # Create some tags
+        PollTag.objects.bulk_create([
+            PollTag(tag=t) for t in 'abc'
+        ])
+
+        self.poll.add_tags(['a', 'b', 'c', 'd'])
+        self.assertEqual(PollTag.objects.all().count(), 4)

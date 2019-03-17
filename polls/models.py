@@ -6,12 +6,36 @@ from . import constants
 import json
 
 
+class PollTag(models.Model):
+    tag = models.CharField(unique=True, max_length=25)
+
+    def __str__(self):
+        return f"#{self.tag}"
+
+    @staticmethod
+    def get_or_create(name):
+        try:
+            tag = PollTag.objects.get(tag=name)
+        except ObjectDoesNotExist:
+            tag = PollTag.objects.create(tag=name)
+        return tag
+
+
 class Poll(models.Model):
     title = models.CharField(max_length=100)
     # Setting null to true in case user deletes their account.
     # We still want to keep the poll.
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     published = models.BooleanField(default=False)
+    tags = models.ManyToManyField(PollTag)
+
+    def add_tags(self, tag_names):
+        available_tags = PollTag.objects.filter(tag__in=tag_names)
+        gotten_tags = set([t.tag for t in available_tags])
+        rest_names = set(tag_names) - gotten_tags
+        rest_tags = [PollTag(tag=tag_name) for tag_name in rest_names]
+        PollTag.objects.bulk_create(rest_tags)
+        self.tags.add(*PollTag.objects.filter(tag__in=tag_names))
 
     def __str__(self):
         return f"#{self.pk} - {self.title}"
@@ -235,4 +259,3 @@ class PollUser(models.Model):
     #  states, etc...
     # TODO(arya): Figure out how to do stuff like high school,
     #  highest education completed, college major, job, etc...
-
